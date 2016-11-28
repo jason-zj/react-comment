@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+    <title>React留言板</title>
+    <link rel="stylesheet" href="js/app.css">
+    <script src="js/react.js"></script>
+    <script src="js/react-dom.js"></script>
+    <script src="js/browser.min.js"></script>    
+    <script type="text/babel">
+    	let comments = [{"author": "Jason", "body": "第一条留言！"},
+			{"author": "Jason Zhang", "body": "第二条留言！"}
+		];
+		
+    	class Comment extends React.Component {
+		  render() {
+			return (
+			  <div>
+				<div className="comment-body">
+				  {this.props.children}
+				</div>
+				<div className="comment-author">
+				  - {this.props.author}
+				</div>
+			  </div>
+			);
+		  }
+		}
+
+		class CommentForm extends React.Component {		
+		  handleSubmit(e) {
+			e.preventDefault();
+			const author = ReactDOM.findDOMNode(this.refs.author).value.trim() || "匿名";
+			const body = ReactDOM.findDOMNode(this.refs.body).value.trim() || "没有留下一句话！";
+			const form = ReactDOM.findDOMNode(this.refs.form);
+			this.props.onSubmit({author: author, body: body});
+			form.reset();
+		  }		
+		  render() {
+			return (
+			  <form className="comment-form" ref="form" onSubmit={e => {this.handleSubmit(e)}}>
+				<input type="text" placeholder="您的名字" ref="author"/>
+				<input type="text" placeholder="留言内容" ref="body"/>
+				<input type="submit" value="发 布"/>
+			  </form>
+			);
+		  }
+		}
+
+		class CommentList extends React.Component {	
+		  render() {
+			var commentsNode = this.props.comments.map(function(comment, index) {
+			  return <Comment key={'comment-' + index} author={comment.author}>{comment.body}</Comment>
+			});
+			return (
+			  <div className="comment-list">
+				{commentsNode}
+			  </div>
+			);
+		  }
+		}
+
+
+		class CommentBox extends React.Component {
+		  constructor(props) {
+			super();
+			this.state = {
+			  comments: comments
+			};
+		  }
+		  
+		  handleNewComment(comment) {
+			const comments = this.state.comments;
+			const newComments = comments.concat([comment]);
+			this.setState({comments: newComments});
+		  }
+		  
+		  
+		  render() {
+			return (
+			  <div className="comment-box">
+				<h1>React留言板</h1>
+				<CommentList comments={this.state.comments}/>
+				<CommentForm onSubmit={comment => this.handleNewComment(comment)}/>
+			  </div>
+			);
+		  }
+		}
+
+		ReactDOM.render(
+		  <CommentBox />,
+		  document.getElementById('example')
+		);
+    </script>
+</head>
+<body>
+    <div id="example"></div>
+</body>
+</html>
